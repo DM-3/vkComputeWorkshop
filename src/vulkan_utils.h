@@ -1,11 +1,13 @@
-#include <vulkan/vulkan.h>
+#include "vulkan\vulkan.h"
 #include <iostream>
 #include <stdexcept>
 #include <vector>
 #include <cstring>
 #include <fstream>
 
-#define ASSERT_VULKAN
+#define ASSERT_VULKAN(val)\
+    if(val != VK_SUCCESS) \
+      __debugbreak();\
 
 
 namespace vkc {
