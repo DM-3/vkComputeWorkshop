@@ -7,13 +7,15 @@ public:
   void endVulkan()    {}
   
 private:
-  VkInstance instance;
-  VkDevice device;
+  VkInstance instance             = VK_NULL_HANDLE;
+  VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+  VkDevice device                 = VK_NULL_HANDLE;
   
-  void createInstance()     {}
-  void createDevice()       {}
-  void createQueue()        {}
-  void createCommandPool()  {}
+  void createInstance()       {}
+  void selectPhysicalDevice() {}
+  void createDevice()         {}
+  void createQueue()          {}
+  void createCommandPool()    {}
   
   void getDevice()      {}
   void getQueue()       {}
@@ -23,7 +25,8 @@ private:
 
 VKC::startVulkan() {
   createInstance();
-
+  selectPhysicalDevice();
+  
 }
 
 VKC::endVulkan() {
@@ -33,6 +36,10 @@ VKC::endVulkan() {
 
 
 VKC::createInstance() {
+  if (vkc::enableValidationLayers && !vkc::checkValidationLayerSupport()) {
+    throw std::runtime_error("validation layers requested, but not available!");
+  }
+  
   VkApplicationInfo appInfo{};
   appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
   appInfo.pApplicationName = "Hello Compute Shader";
@@ -48,11 +55,26 @@ VKC::createInstance() {
   instanceCI.ppEnabledExtensionNames = nullptr;
   instanceCI.enabledLayerCount = 0;
   
+  if (vkc::enableValidationLayers) {
+    instanceCI.enabledLayerCount = static_cast<uint32_t>(vkc::validationLayers.size());
+    instanceCI.ppEnabledLayerNames = vkc::validationLayers.data();
+  } else {
+    createInfo.enabledLayerCount = 0;
+  }
+  
   vkc::result = vkCreateInstance(&instanceCI, nullptr, &instance);
   ASSERT_VULKAN(vkc::result);
 }
 
-VKC::create
+VKC::selectPhysicalDevice() {
+  uint32_t deviceCount = 0;
+  vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+  if(deviceCount == 0) throw std::runtime_error("No GPUs ;_; ");
+  std::vector<VkPhysicalDevice> devices(deviceCount);
+  vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+  
+  
+}
 
 
 
