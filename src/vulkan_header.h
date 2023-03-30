@@ -7,10 +7,15 @@ public:
   void execute()      {}
   void endVulkan()    {}
   
-  // getters
-  void getDevice()      {}
-  void getQueue()       {}
-  void getCommandPool() {}
+  // getters/setters
+  VkDevice        getDevice()       {}
+  VkDeviceMemory  getInputMemory()  {}
+  VkDeviceMemory  getOutputMemory() {}
+  
+  void      setInputSize(uint32_t)  {}
+  uint32_t  getInputSize()          {}
+  void      setOutputSize(uint32_t) {}
+  uint32_t  getOutputSize()         {}
   
 private:
   VkInstance instance                       = VK_NULL_HANDLE;
@@ -88,6 +93,16 @@ void VKC::endVulkan() {
   vkDestroyDevice(device, nullptr);
   vkDestroyInstance(instance, nullptr); 
 }
+
+
+// getter/setter functions
+VkDevice        VKC::getDevice()        { return device; }
+VkDeviceMemory  VKC::getInputMemory()   { return inputBufferMemory; }
+VkDeviceMemory  VKC::getOutputMemory()  { return outputBufferMemory; }
+void      VKC::setInputSize(uint32_t val)   { inputSize = val; }
+uint32_t  VKC::getInputSize()               { return inputSize; }
+void      VKC::setOutputSize(uint32_t val)  { outputSize = val; }
+uint32_t  VKC::getOutputSize()              { return outputSize; }
 
 
 // private functions
