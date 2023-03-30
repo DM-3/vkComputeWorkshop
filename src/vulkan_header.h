@@ -21,6 +21,17 @@ private:
   
 };
 
+VKC::startVulkan() {
+  createInstance();
+
+}
+
+VKC::endVulkan() {
+  
+  vkDestroyInstance(instance, nullptr); 
+}
+
+
 VKC::createInstance() {
   VkApplicationInfo appInfo{};
   appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -37,8 +48,11 @@ VKC::createInstance() {
   instanceCI.ppEnabledExtensionNames = nullptr;
   instanceCI.enabledLayerCount = 0;
   
-  
+  vkc::result = vkCreateInstance(&instanceCI, nullptr, &instance);
+  ASSERT_VULKAN(vkc::result);
 }
+
+VKC::create
 
 
 
