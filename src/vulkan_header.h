@@ -120,6 +120,8 @@ VKC::createLogicalDevice() {
 }
 
 VKC::createPipeline() {
+  auto shaderCode = vkc::readFile("shaders/comp.spv");
+  VkShaderModule shaderModule = createShaderModule(shaderCode);
   
   
 }
