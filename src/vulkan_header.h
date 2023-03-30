@@ -17,6 +17,8 @@ private:
   VkDescriptorSet descriptorSet             = VK_NULL_HANDLE;
   VkPipeline pipeline                       = VK_NULL_HANDLE;
   VkPipelineLayout pipelineLayout           = VK_NULL_HANDLE;
+  VkCommandPool commandPool                 = VK_NULL_HANDLE;
+  VkCommandBuffer commandBuffer             = VK_NULL_HANDLE;
   
   void createInstance()       {}
   void selectPhysicalDevice() {}
@@ -24,6 +26,8 @@ private:
   void createLogicalDevice()  {}
   void createPipeline()       {}
   void createCommandPool()    {}
+  void createCommandBuffer()  {}
+  void recordCommandBuffer()  {}
   
   void getDevice()      {}
   void getQueue()       {}
@@ -37,13 +41,17 @@ VKC::startVulkan() {
   selectQueueFamily();
   createLogicalDevice();
   createPipeline();
+  createCommandPool();
+  createCommandBuffer();
+  recordCommandBuffer();
   
 }
 
 VKC::endVulkan() {
   
+  vkDestroyCommandPool(device, commandPool, nullptr);
+  vkDestroyPipeline(device, pipeline, nullptr);
   vkDestroyPipelineLayout(deivce, pipelineLayout, nullptr);
-  vkDestroyPipeline();
   vkDestroyDevice(device, nullptr);
   vkDestroyInstance(instance, nullptr); 
 }
@@ -155,6 +163,47 @@ VKC::createPipeline() {
   
   vkDestroyShaderModule(device, shaderModule, nullptr);
 }
+
+VKC::createCommandPool() {
+  VkCommandPoolCreateInfo commandPoolCI{};
+  commandPoolCI.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+  commandPoolCI.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BUT;
+  commandPoolCI.queueFamilyIndex = queueFamilyIndex;
+  
+  vkc::result = vkCreateCommandPool(device, &commandPoolCI, nullptr, &commandPool);
+  ASSERT_VULKAN(vkc::result);
+}
+
+VKC::createCommandBuffer() {
+  VkCommandBufferAllocateInfo commandBufferAI{};
+  commandBufferAI.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+  commandBufferAI.commandPool = commandPool;
+  commandBufferAI.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+  commandBufferAI.commandBufferCount = 1;
+  
+  vkc::result = vkAllocateCommandBuffers(device, &commandBufferAI, &commandBuffer);
+  ASSERT_VULKAN(vkc::result);
+}
+
+VKC::recordCommandBuffer() {
+  VkCommandBufferBeginInfo commandBufferBI{};
+  commandBufferBI.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+  commandBufferBI.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+  commandBufferBI.pInheritanceInfo = nullptr;
+  
+  vkc::result = vkBeginCommandBuffer(commandBuffer, &beginInfo);
+  ASSERT_VULKAN(vkc::result);
+  
+  // recording commands
+  vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
+  vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipelineLayout,
+    0, 1, &descriptorSet, 0, 0);
+  vkCmdDispatch(commandBuffer, 1, 1, 1);      // specify number of workgroups to dispatch
+  
+  vkc::result = vkEndCommandBuffer(commandBuffer);
+  ASSERT_VULKAN(vkc::result);
+}
+
 
 
 
