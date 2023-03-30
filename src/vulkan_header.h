@@ -75,7 +75,18 @@ void VKC::startVulkan() {
 }
 
 void VKC::execute() {
+  VkFence fence;
+  VkFenceCreateInfo fenceCI{};
+  fenceCI.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+  vkCreateFence(device, &fenceCI, nullptr, &fence);
   
+  VkSubmitInfo submit{};
+  submit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+  submit.commandBufferCount = 1;
+  submit.pCommandBuffers = &commandBuffer;
+  
+  vkc::result = vkQueueSubmit(queue, 1, &submit, fence);
+  ASSERT_VULKAN(vkc::result);
 }
 
 void VKC::endVulkan() {
