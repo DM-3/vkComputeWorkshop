@@ -61,6 +61,21 @@ namespace vkc {
     file.close();
     return buffer;
   }
+  
+  // function
+  VkShaderModule createShaderModule(VkDevice device, const std::vector<char>& code) {
+    VkShaderModuleCreateInfo moduleCI;
+    moduleCI.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    moduleCI.codeSize = code.size();
+    moduleCI.pCode = reinterpret_cast<const uint32_t*>(code.data());
+        
+    VkShaderModule shaderModule;
+    vkc::result = vkCreateShaderModule(device, &moduleCI, nullptr, &shaderModule);
+    ASSERT_VULKAN(vkc::result);
+    
+    return shaderModule;
+  }
+  
 };
 
 
