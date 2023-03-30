@@ -73,7 +73,15 @@ VKC::selectPhysicalDevice() {
   std::vector<VkPhysicalDevice> devices(deviceCount);
   vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
   
+  for(const auto& _device : devices) {
+    if(isDeviceSuitable(_device)) {
+      physicalDevice = _device;
+      break;
+    }
+  }
   
+  if(physicalDevice == VK_NULL_HANDLE)
+    throw std::runtime_error("No suitable GPU ;_; ");   
 }
 
 
