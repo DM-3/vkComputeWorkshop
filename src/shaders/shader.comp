@@ -1,7 +1,15 @@
 #version 450
 
-layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
+layout(local_size_x = 128, local_size_y = 1, local_size_z = 1) in;
+
+layout(binding = 0) buffer layout_in {
+	float input[];
+};
+
+layout(binding = 1) buffer layout_out {
+	float output[];
+};
 
 void main() {
-		// do fancy calculation in here
+	output[gl_GlobalInvocationID.x] = input[gl_GlobalInvocationID.y] * 2.0;
 }
