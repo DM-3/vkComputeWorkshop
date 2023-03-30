@@ -43,12 +43,6 @@ namespace vkc {
 
     return true;
   }
-	
-	bool isDeviceSuitable(VkPhysicalDevice physicalDevice) {
-    
-		
-		return true;
-	}
 };
 
 
