@@ -2,9 +2,15 @@
 
 class VKC {
 public:
+  // important stuff
   void startVulkan()  {}
   void execute()      {}
   void endVulkan()    {}
+  
+  // getters
+  void getDevice()      {}
+  void getQueue()       {}
+  void getCommandPool() {}
   
 private:
   VkInstance instance                       = VK_NULL_HANDLE;
@@ -17,10 +23,10 @@ private:
   VkDescriptorPool descriptorPool           = VK_NULL_HANDLE;
   uint32_t inputSize                        = 0;
   VkBuffer inputBuffer                      = VK_NULL_HANDLE;
-  VkMemory inputBufferMemory                = VK_NULL_HANDLE;
+  VkDeviceMemory inputBufferMemory          = VK_NULL_HANDLE;
   uint32_t outputSize                       = 0;
   VkBuffer outputBuffer                     = VK_NULL_HANDLE;
-  VkMemory outputBufferMemory               = VK_NULL_HANDLE;
+  VkDeviceMemory outputBufferMemory         = VK_NULL_HANDLE;
   VkDescriptorSet descriptorSet             = VK_NULL_HANDLE;
   
   VkPipeline pipeline                       = VK_NULL_HANDLE;
@@ -42,11 +48,6 @@ private:
   void createCommandPool()          {}
   void createCommandBuffer()        {}
   void recordCommandBuffer()        {}
-  
-  void getDevice()      {}
-  void getQueue()       {}
-  void getCommandPool() {}
-  
 };
 
 // public functions
@@ -55,6 +56,12 @@ void VKC::startVulkan() {
   selectPhysicalDevice();
   selectQueueFamily();
   createLogicalDevice();
+  
+  createDescriptorSetLayout();
+  createDescriptorPool();
+  createBuffers();
+  createDescriptorSet();
+  
   createPipeline();
   createCommandPool();
   createCommandBuffer();
@@ -69,9 +76,12 @@ void VKC::execute() {
 void VKC::endVulkan() {
   
   vkDestroyBuffer(device, inputBuffer, nullptr);
+  vkFreeMemory(device, inputBufferMemory, nullptr);
   vkDestroyBuffer(device, outputBuffer, nullptr);  
+  vkFreeMemory(device, outputBufferMemory, nullptr);
   vkDestroyDescriptorPool(device, descriptorPool, nullptr);
   vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+  
   vkDestroyCommandPool(device, commandPool, nullptr);
   vkDestroyPipeline(device, pipeline, nullptr);
   vkDestroyPipelineLayout(deivce, pipelineLayout, nullptr);
@@ -197,21 +207,55 @@ void VKC::createDescriptorPool() {
 }
 
 void VKC::createBuffers() {
-  VkBufferCreateInfo inputBufferCI{};
-  inputBufferCI.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-  inputBufferCI.size = inputSize;
-  inputBufferCI.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
-  inputBufferCI.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+  // input buffer
+  {
+    VkBufferCreateInfo bufferCI{};
+    bufferCI.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferCI.size = inputSize;
+    bufferCI.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+    bufferCI.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    vkc::result = vkCreateBuffer(device, &bufferCI, nullptr, &inputBuffer);
+    ASSERT_VULKAN(vkc::result);
+
+    VkMemoryRequirements memoryRequirements;
+    vkGetBufferMemoryRequirements(device, inputBuffer, &memoryRequirements);
+
+    VkMemoryAllocateInfo memoryAI{};
+    memoryAI.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    memoryAI.allocationSize = memoryRequirements.size;
+    memoryAI.memoryTypeIndex = findMemoryType(memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+    
+    vkc::result = vkAllocateMemory(device, &memoryAI, nullptr, &inputBufferMemory);
+    ASSERT_VULKAN(vkc::result);
+    
+    vkBindBufferMemory(device, inputBuffer, inputBufferMemory);
+  }
   
-  vkc::result = vkCreateBuffer(device, &inputBufferCI, nullptr, &inputBuffer);
-  ASSERT_VULKAN(vkc::result);
-  
-  VkMemoryRequirements memoryRequirements;
-  vkGetBufferMemoryRequirements(device, inputBuffer, &memoryRequirements);
-  
-  
-  
-  
+  // output buffer
+  {
+    VkBufferCreateInfo bufferCI{};
+    bufferCI.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferCI.size = outputSize;
+    bufferCI.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+    bufferCI.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    vkc::result = vkCreateBuffer(device, &bufferCI, nullptr, &outputBuffer);
+    ASSERT_VULKAN(vkc::result);
+
+    VkMemoryRequirements memoryRequirements;
+    vkGetBufferMemoryRequirements(device, outputBuffer, &memoryRequirements);
+
+    VkMemoryAllocateInfo memoryAI{};
+    memoryAI.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    memoryAI.allocationSize = memoryRequirements.size;
+    memoryAI.memoryTypeIndex = findMemoryType(memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+    
+    vkc::result = vkAllocateMemory(device, &memoryAI, nullptr, &outputBufferMemory);
+    ASSERT_VULKAN(vkc::result);
+    
+    vkBindBufferMemory(device, outputBuffer, outputBufferMemory);
+  }
 }
 
 void VKC::createDescriptorSet() {
