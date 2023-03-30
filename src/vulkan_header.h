@@ -9,12 +9,16 @@ public:
 private:
   VkInstance instance             = VK_NULL_HANDLE;
   VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+  uint32_t queueFamilyIndex       = 0;
   VkDevice device                 = VK_NULL_HANDLE;
+  VkQueue queue                   = VK_NULL_HANDLE;
+  VkPipeline pipeline             = VK_NULL_HANDLE;
   
   void createInstance()       {}
   void selectPhysicalDevice() {}
-  void createDevice()         {}
-  void createQueue()          {}
+  void selectQueueFamily()    {}
+  void createLogicalDevice()  {}
+  void createPipeline()       {}
   void createCommandPool()    {}
   
   void getDevice()      {}
@@ -26,11 +30,15 @@ private:
 VKC::startVulkan() {
   createInstance();
   selectPhysicalDevice();
+  selectQueueFamily();
+  createLogicalDevice();
+  createPipeline();
   
 }
 
 VKC::endVulkan() {
   
+  vkDestroyDevice(device, nullptr);
   vkDestroyInstance(instance, nullptr); 
 }
 
@@ -73,18 +81,48 @@ VKC::selectPhysicalDevice() {
   std::vector<VkPhysicalDevice> devices(deviceCount);
   vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
   
-  for(const auto& _device : devices) {
-    if(isDeviceSuitable(_device)) {
-      physicalDevice = _device;
+  physicalDevice = devices[0];
+}
+
+VKC::selectQueueFamily() {
+  uint32_t queueFamilyCount = 0;
+  vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
+  std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+  vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilies.data());
+  
+  for(int i = 0; i < queueFamilyCount; i++) {
+    if(queueFamilies[i].queueFlags & VK_QUEUE_COMPUTE_BIT) {
+      queueFamilyIndex = i;
       break;
     }
   }
-  
-  if(physicalDevice == VK_NULL_HANDLE)
-    throw std::runtime_error("No suitable GPU ;_; ");   
 }
 
+VKC::createLogicalDevice() {
+  VkDeviceQueueCreateInfo queueCI{};
+  queueCIsType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+  queueCI.queueFamilyIndex = queueFamilyIndex;
+  queueCI.queueCount = 1;
+  float queuePriority = 1.0f;
+  queueCI.pQueuePriorities = &queuePriority;
+  
+  VkDeviceCreateInfo deviceCI;
+  deviceCI.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+  deviceCI.queueCreateInfoCount = 1;
+  deviceCI.pQueueCreateInfos = &queueCI;
+  deviceCI.pEnabledFeatures = &deviceFeatures;
+  deviceCI.enabledExtensionCount = 0;
+  
+  vkc::result = vkCreateDevice(physicalDevice, &deviceCI, nullptr, &device);
+  ASSERT_VULKAN(vkc::result);
+  
+  vkGetDeviceQueue(device, queueFamilyIndex, 0, &queue);
+}
 
+VKC::createPipeline() {
+  
+  
+}
 
 
 
