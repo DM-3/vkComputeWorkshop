@@ -7,12 +7,16 @@ public:
   void endVulkan()    {}
   
 private:
-  VkInstance instance             = VK_NULL_HANDLE;
-  VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-  uint32_t queueFamilyIndex       = 0;
-  VkDevice device                 = VK_NULL_HANDLE;
-  VkQueue queue                   = VK_NULL_HANDLE;
-  VkPipeline pipeline             = VK_NULL_HANDLE;
+  VkInstance instance                       = VK_NULL_HANDLE;
+  VkPhysicalDevice physicalDevice           = VK_NULL_HANDLE;
+  uint32_t queueFamilyIndex                 = 0;
+  VkDevice device                           = VK_NULL_HANDLE;
+  VkQueue queue                             = VK_NULL_HANDLE;
+  VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
+  VkDescriptorPool descriptorPool           = VK_NULL_HANDLE;
+  VkDescriptorSet descriptorSet             = VK_NULL_HANDLE;
+  VkPipeline pipeline                       = VK_NULL_HANDLE;
+  VkPipelineLayout pipelineLayout           = VK_NULL_HANDLE;
   
   void createInstance()       {}
   void selectPhysicalDevice() {}
@@ -38,6 +42,8 @@ VKC::startVulkan() {
 
 VKC::endVulkan() {
   
+  vkDestroyPipelineLayout(deivce, pipelineLayout, nullptr);
+  vkDestroyPipeline();
   vkDestroyDevice(device, nullptr);
   vkDestroyInstance(instance, nullptr); 
 }
@@ -121,9 +127,33 @@ VKC::createLogicalDevice() {
 
 VKC::createPipeline() {
   auto shaderCode = vkc::readFile("shaders/comp.spv");
-  VkShaderModule shaderModule = createShaderModule(shaderCode);
+  VkShaderModule shaderModule = vkc::createShaderModule(shaderCode);
+  
+  VkPipelineShaderStageCreateInfo shaderStageCI;
+  shaderStageCI.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+  shaderStageCI.stage = VK_SHADER_STAGE_COMPUTE_BIT;
+  shaderStageCI.module = shaderModule;
+  shaderStageCI.pName = "main";
+  
+  VkPipelineLayoutCreateInfo layoutCI{};
+  layoutCI.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+  layoutCI.setLayoutCount = 1;
+  layoutCI.pSetLayouts = &descriptorSetLayout;
+  layoutCI.pushConstantRangeCount = 0;
+  
+  vkc::result = vkCreatePipelineLayout(device, &layoutCI, nullptr, &pipelineLayout);
+  ASSERT_VULKAN(vkc::result);
+  
+  VkComputePipelineCreateInfo pipelineCI{};
+  pipelineCI.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+  pipelineCI.layout = computePipelineLayout;
+  pipelineCI.stage = computeShaderStageInfo;
+  
+  vkc::result = vkCreateComputePipelines(device, VK_NULL_HANDLE, 1, &pipelineCI, nullptr, &pipeline);
+  ASSERT_VULKAN(vkc::result);
   
   
+  vkDestroyShaderModule(device, shaderModule, nullptr);
 }
 
 
