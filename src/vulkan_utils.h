@@ -90,6 +90,30 @@ namespace vkc {
     throw std::runtime_error("failed to find suitable memory type");
   }
   
+  // function
+  void createBuffer(VkDevice device, VkBuffer* buffer, VkDevieMemory* memory, uint32_t size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties) {
+    VkBufferCreateInfo bufferCI{};
+    bufferCI.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferCI.size = size;
+    bufferCI.usage = usage;
+    bufferCI.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    vkc::result = vkCreateBuffer(device, &bufferCI, nullptr, buffer);
+    ASSERT_VULKAN(vkc::result);
+
+    VkMemoryRequirements memoryRequirements;
+    vkGetBufferMemoryRequirements(device, *buffer, &memoryRequirements);
+
+    VkMemoryAllocateInfo memoryAI{};
+    memoryAI.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    memoryAI.allocationSize = memoryRequirements.size;
+    memoryAI.memoryTypeIndex = findMemoryType(memoryRequirements.memoryTypeBits, properties);
+    
+    vkc::result = vkAllocateMemory(device, &memoryAI, nullptr, memory);
+    ASSERT_VULKAN(vkc::result);
+    
+    vkBindBufferMemory(device, *buffer, *memory);
+  }
   
 };
 
