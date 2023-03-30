@@ -24,7 +24,7 @@ int main() {
   comp.execute();
   
   vkMapMemory(comp.getDevice(), comp.getOutputMemory(), 0, comp.getOuptutSize(), 0, &data);
-  memcpy(data, arr_out, OUTPUT_COUNT * sizeof(float));
+  memcpy(arr_out, data, OUTPUT_COUNT * sizeof(float));
   vkUnmapMemory(comp.getDevice(), comp.getOutputMemory());
   
   comp.endVulkan();
