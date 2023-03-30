@@ -1,5 +1,8 @@
 #include <vulkan>
 
-VkResult result;
-
 #define ASSERT_VULKAN
+
+
+namespace vkc {
+  VkResult result;
+};
