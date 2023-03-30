@@ -207,55 +207,10 @@ void VKC::createDescriptorPool() {
 }
 
 void VKC::createBuffers() {
-  // input buffer
-  {
-    VkBufferCreateInfo bufferCI{};
-    bufferCI.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufferCI.size = inputSize;
-    bufferCI.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
-    bufferCI.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-    vkc::result = vkCreateBuffer(device, &bufferCI, nullptr, &inputBuffer);
-    ASSERT_VULKAN(vkc::result);
-
-    VkMemoryRequirements memoryRequirements;
-    vkGetBufferMemoryRequirements(device, inputBuffer, &memoryRequirements);
-
-    VkMemoryAllocateInfo memoryAI{};
-    memoryAI.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    memoryAI.allocationSize = memoryRequirements.size;
-    memoryAI.memoryTypeIndex = findMemoryType(memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-    
-    vkc::result = vkAllocateMemory(device, &memoryAI, nullptr, &inputBufferMemory);
-    ASSERT_VULKAN(vkc::result);
-    
-    vkBindBufferMemory(device, inputBuffer, inputBufferMemory);
-  }
-  
-  // output buffer
-  {
-    VkBufferCreateInfo bufferCI{};
-    bufferCI.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufferCI.size = outputSize;
-    bufferCI.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
-    bufferCI.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-    vkc::result = vkCreateBuffer(device, &bufferCI, nullptr, &outputBuffer);
-    ASSERT_VULKAN(vkc::result);
-
-    VkMemoryRequirements memoryRequirements;
-    vkGetBufferMemoryRequirements(device, outputBuffer, &memoryRequirements);
-
-    VkMemoryAllocateInfo memoryAI{};
-    memoryAI.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    memoryAI.allocationSize = memoryRequirements.size;
-    memoryAI.memoryTypeIndex = findMemoryType(memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-    
-    vkc::result = vkAllocateMemory(device, &memoryAI, nullptr, &outputBufferMemory);
-    ASSERT_VULKAN(vkc::result);
-    
-    vkBindBufferMemory(device, outputBuffer, outputBufferMemory);
-  }
+  createBuffer(device, &inputBuffer, &inputBufferMemory, inputSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, 
+                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+  createBuffer(device, &outputBuffer, &outputBufferMemory, outputSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, 
+                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 }
 
 void VKC::createDescriptorSet() {
