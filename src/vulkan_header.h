@@ -87,6 +87,11 @@ void VKC::execute() {
   
   vkc::result = vkQueueSubmit(queue, 1, &submit, fence);
   ASSERT_VULKAN(vkc::result);
+  
+  vkc::result = vkWaitForFences(device, 1, &fence, VK_TRUE, UINT64_MAX);
+  ASSERT_VULKAN(vkc::result);
+  
+  vkDestroyFence(device, fence, nullptr);
 }
 
 void VKC::endVulkan() {
