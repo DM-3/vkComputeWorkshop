@@ -239,9 +239,9 @@ void VKC::createDescriptorPool() {
 }
 
 void VKC::createBuffers() {
-  vkc::createBuffer(device, &inputBuffer, &inputBufferMemory, inputSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, 
+  vkc::createBuffer(device, physicalDevice, &inputBuffer, &inputBufferMemory, inputSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, 
                  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-  vkc::createBuffer(device, &outputBuffer, &outputBufferMemory, outputSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, 
+  vkc::createBuffer(device, physicalDevice, &outputBuffer, &outputBufferMemory, outputSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, 
                  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 }
 
