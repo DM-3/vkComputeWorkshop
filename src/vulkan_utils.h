@@ -80,12 +80,12 @@ namespace vkc {
   }
   
   // function
-  uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
+  uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties) {
     VkPhysicalDeviceMemoryProperties memoryProperties;
     vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);
     
-    for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
-      if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+    for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; i++) {
+      if ((typeFilter & (1 << i)) && (memoryProperties.memoryTypes[i].propertyFlags & properties) == properties) {
         return i;
       }
     }
@@ -94,7 +94,7 @@ namespace vkc {
   }
   
   // function
-  void createBuffer(VkDevice device, VkBuffer* buffer, VkDevieMemory* memory, uint32_t size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties) {
+  void createBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkBuffer* buffer, VkDeviceMemory* memory, uint32_t size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties) {
     VkBufferCreateInfo bufferCI{};
     bufferCI.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferCI.size = size;
@@ -110,12 +110,12 @@ namespace vkc {
     VkMemoryAllocateInfo memoryAI{};
     memoryAI.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     memoryAI.allocationSize = memoryRequirements.size;
-    memoryAI.memoryTypeIndex = findMemoryType(memoryRequirements.memoryTypeBits, properties);
+    memoryAI.memoryTypeIndex = findMemoryType(physicalDevice, memoryRequirements.memoryTypeBits, properties);
     
     vkc::result = vkAllocateMemory(device, &memoryAI, nullptr, memory);
     ASSERT_VULKAN(vkc::result);
     
-    vkBindBufferMemory(device, *buffer, *memory);
+    vkBindBufferMemory(device, *buffer, *memory, 0);
   }
   
 };
