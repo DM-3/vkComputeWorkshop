@@ -179,24 +179,26 @@ void VKC::selectQueueFamily() {
 }
 
 void VKC::createLogicalDevice() {
-  VkDeviceQueueCreateInfo queueCI{};
-  queueCI.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-  queueCI.queueFamilyIndex = queueFamilyIndex;
-  queueCI.queueCount = 1;
-  float queuePriority = 1.0f;
-  queueCI.pQueuePriorities = &queuePriority;
-  
-  VkDeviceCreateInfo deviceCI;
-  deviceCI.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-  deviceCI.queueCreateInfoCount = 1;
-  deviceCI.pQueueCreateInfos = &queueCI;
-  deviceCI.pEnabledFeatures = nullptr;
-  deviceCI.enabledExtensionCount = 0;
-  
-  vkc::result = vkCreateDevice(physicalDevice, &deviceCI, nullptr, &device);
-  ASSERT_VULKAN(vkc::result);
-  
-  vkGetDeviceQueue(device, queueFamilyIndex, 0, &queue);
+    VkDeviceQueueCreateInfo queueCI{};
+    queueCI.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    queueCI.queueFamilyIndex = queueFamilyIndex;
+    queueCI.queueCount = 1;
+    float queuePriority = 1.0f;
+    queueCI.pQueuePriorities = &queuePriority;
+
+    VkPhysicalDeviceFeatures deviceFeatures{};
+
+    VkDeviceCreateInfo deviceCI;
+    deviceCI.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    deviceCI.queueCreateInfoCount = 1;
+    deviceCI.pQueueCreateInfos = &queueCI;
+    deviceCI.pEnabledFeatures = &deviceFeatures;
+    deviceCI.enabledExtensionCount = 0;
+
+    vkc::result = vkCreateDevice(physicalDevice, &deviceCI, nullptr, &device);
+    ASSERT_VULKAN(vkc::result);
+
+    vkGetDeviceQueue(device, queueFamilyIndex, 0, &queue);
 }
 
 void VKC::createDescriptorSetLayout() {
