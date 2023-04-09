@@ -3,13 +3,13 @@
 layout(local_size_x = 128, local_size_y = 1, local_size_z = 1) in;
 
 layout(binding = 0) buffer layout_in {
-	float input[];
+	float in_data[];
 };
 
 layout(binding = 1) buffer layout_out {
-	float output[];
+	float out_data[];
 };
 
 void main() {
-	output[gl_GlobalInvocationID.x] = input[gl_GlobalInvocationID.y] * 2.0;
+	out_data[gl_GlobalInvocationID.x] = in_data[gl_GlobalInvocationID.y] * 2.0;
 }
