@@ -23,7 +23,7 @@ int main() {
   
   comp.execute();
   
-  vkMapMemory(comp.getDevice(), comp.getOutputMemory(), 0, comp.getOuptutSize(), 0, &data);
+  vkMapMemory(comp.getDevice(), comp.getOutputMemory(), 0, comp.getOutputSize(), 0, &data);
   memcpy(arr_out, data, OUTPUT_COUNT * sizeof(float));
   vkUnmapMemory(comp.getDevice(), comp.getOutputMemory());
   
