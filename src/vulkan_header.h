@@ -106,7 +106,7 @@ void VKC::endVulkan() {
   
   vkDestroyCommandPool(device, commandPool, nullptr);
   vkDestroyPipeline(device, pipeline, nullptr);
-  vkDestroyPipelineLayout(deivce, pipelineLayout, nullptr);
+  vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
   vkDestroyDevice(device, nullptr);
   vkDestroyInstance(instance, nullptr); 
 }
@@ -147,7 +147,7 @@ void VKC::createInstance() {
     instanceCI.enabledLayerCount = static_cast<uint32_t>(vkc::validationLayers.size());
     instanceCI.ppEnabledLayerNames = vkc::validationLayers.data();
   } else {
-    createInfo.enabledLayerCount = 0;
+    instanceCI.enabledLayerCount = 0;
   }
   
   vkc::result = vkCreateInstance(&instanceCI, nullptr, &instance);
@@ -180,7 +180,7 @@ void VKC::selectQueueFamily() {
 
 void VKC::createLogicalDevice() {
   VkDeviceQueueCreateInfo queueCI{};
-  queueCIsType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+  queueCI.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
   queueCI.queueFamilyIndex = queueFamilyIndex;
   queueCI.queueCount = 1;
   float queuePriority = 1.0f;
@@ -190,7 +190,7 @@ void VKC::createLogicalDevice() {
   deviceCI.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
   deviceCI.queueCreateInfoCount = 1;
   deviceCI.pQueueCreateInfos = &queueCI;
-  deviceCI.pEnabledFeatures = &deviceFeatures;
+  deviceCI.pEnabledFeatures = nullptr;
   deviceCI.enabledExtensionCount = 0;
   
   vkc::result = vkCreateDevice(physicalDevice, &deviceCI, nullptr, &device);
@@ -199,7 +199,7 @@ void VKC::createLogicalDevice() {
   vkGetDeviceQueue(device, queueFamilyIndex, 0, &queue);
 }
 
-void VKC::createDescriptorSetlayout() {
+void VKC::createDescriptorSetLayout() {
   std::vector<VkDescriptorSetLayoutBinding> layoutBindings(2);
   
   layoutBindings[0].binding = 0;
@@ -239,9 +239,9 @@ void VKC::createDescriptorPool() {
 }
 
 void VKC::createBuffers() {
-  createBuffer(device, &inputBuffer, &inputBufferMemory, inputSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, 
+  vkc::createBuffer(device, &inputBuffer, &inputBufferMemory, inputSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, 
                  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-  createBuffer(device, &outputBuffer, &outputBufferMemory, outputSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, 
+  vkc::createBuffer(device, &outputBuffer, &outputBufferMemory, outputSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, 
                  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 }
 
@@ -290,7 +290,7 @@ void VKC::createDescriptorSet() {
 
 void VKC::createPipeline() {
   auto shaderCode = vkc::readFile("shaders/comp.spv");
-  VkShaderModule shaderModule = vkc::createShaderModule(shaderCode);
+  VkShaderModule shaderModule = vkc::createShaderModule(device, shaderCode);
   
   VkPipelineShaderStageCreateInfo shaderStageCI;
   shaderStageCI.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -309,8 +309,8 @@ void VKC::createPipeline() {
   
   VkComputePipelineCreateInfo pipelineCI{};
   pipelineCI.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-  pipelineCI.layout = computePipelineLayout;
-  pipelineCI.stage = computeShaderStageInfo;
+  pipelineCI.layout = pipelineLayout;
+  pipelineCI.stage = shaderStageCI;
   
   vkc::result = vkCreateComputePipelines(device, VK_NULL_HANDLE, 1, &pipelineCI, nullptr, &pipeline);
   ASSERT_VULKAN(vkc::result);
@@ -322,7 +322,7 @@ void VKC::createPipeline() {
 void VKC::createCommandPool() {
   VkCommandPoolCreateInfo commandPoolCI{};
   commandPoolCI.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-  commandPoolCI.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BUT;
+  commandPoolCI.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
   commandPoolCI.queueFamilyIndex = queueFamilyIndex;
   
   vkc::result = vkCreateCommandPool(device, &commandPoolCI, nullptr, &commandPool);
@@ -346,7 +346,7 @@ void VKC::recordCommandBuffer() {
   commandBufferBI.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
   commandBufferBI.pInheritanceInfo = nullptr;
   
-  vkc::result = vkBeginCommandBuffer(commandBuffer, &beginInfo);
+  vkc::result = vkBeginCommandBuffer(commandBuffer, &commandBufferBI);
   ASSERT_VULKAN(vkc::result);
   
   // recording commands
