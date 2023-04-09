@@ -3,57 +3,57 @@
 
 class VKC {
 public:
-  // important stuff
-  void startVulkan()  {}
-  void execute()      {}
-  void endVulkan()    {}
-  
-  // getters/setters
-  VkDevice        getDevice()       {}
-  VkDeviceMemory  getInputMemory()  {}
-  VkDeviceMemory  getOutputMemory() {}
-  
-  void      setInputSize(uint32_t)  {}
-  uint32_t  getInputSize()          {}
-  void      setOutputSize(uint32_t) {}
-  uint32_t  getOutputSize()         {}
-  
+    // important stuff
+    void startVulkan();
+    void execute();
+    void endVulkan();
+
+    // getters/setters
+    VkDevice        getDevice();
+    VkDeviceMemory  getInputMemory();
+    VkDeviceMemory  getOutputMemory();
+
+    void      setInputSize(uint32_t);
+    uint32_t  getInputSize();
+    void      setOutputSize(uint32_t);
+    uint32_t  getOutputSize();
+
 private:
-  VkInstance instance                       = VK_NULL_HANDLE;
-  VkPhysicalDevice physicalDevice           = VK_NULL_HANDLE;
-  uint32_t queueFamilyIndex                 = 0;
-  VkDevice device                           = VK_NULL_HANDLE;
-  VkQueue queue                             = VK_NULL_HANDLE;
-  
-  VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
-  VkDescriptorPool descriptorPool           = VK_NULL_HANDLE;
-  uint32_t inputSize                        = 0;
-  VkBuffer inputBuffer                      = VK_NULL_HANDLE;
-  VkDeviceMemory inputBufferMemory          = VK_NULL_HANDLE;
-  uint32_t outputSize                       = 0;
-  VkBuffer outputBuffer                     = VK_NULL_HANDLE;
-  VkDeviceMemory outputBufferMemory         = VK_NULL_HANDLE;
-  VkDescriptorSet descriptorSet             = VK_NULL_HANDLE;
-  
-  VkPipeline pipeline                       = VK_NULL_HANDLE;
-  VkPipelineLayout pipelineLayout           = VK_NULL_HANDLE;
-  VkCommandPool commandPool                 = VK_NULL_HANDLE;
-  VkCommandBuffer commandBuffer             = VK_NULL_HANDLE;
-  
-  void createInstance()             {}
-  void selectPhysicalDevice()       {}
-  void selectQueueFamily()          {}
-  void createLogicalDevice()        {}
-  
-  void createDescriptorSetLayout()  {}  
-  void createDescriptorPool()       {}
-  void createBuffers()              {}
-  void createDescriptorSet()        {}
-  
-  void createPipeline()             {}
-  void createCommandPool()          {}
-  void createCommandBuffer()        {}
-  void recordCommandBuffer()        {}
+    VkInstance instance = VK_NULL_HANDLE;
+    VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+    uint32_t queueFamilyIndex = 0;
+    VkDevice device = VK_NULL_HANDLE;
+    VkQueue queue = VK_NULL_HANDLE;
+
+    VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
+    VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
+    uint32_t inputSize = 0;
+    VkBuffer inputBuffer = VK_NULL_HANDLE;
+    VkDeviceMemory inputBufferMemory = VK_NULL_HANDLE;
+    uint32_t outputSize = 0;
+    VkBuffer outputBuffer = VK_NULL_HANDLE;
+    VkDeviceMemory outputBufferMemory = VK_NULL_HANDLE;
+    VkDescriptorSet descriptorSet = VK_NULL_HANDLE;
+
+    VkPipeline pipeline = VK_NULL_HANDLE;
+    VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
+    VkCommandPool commandPool = VK_NULL_HANDLE;
+    VkCommandBuffer commandBuffer = VK_NULL_HANDLE;
+
+    void createInstance();
+    void selectPhysicalDevice();
+    void selectQueueFamily();
+    void createLogicalDevice();
+
+    void createDescriptorSetLayout();
+    void createDescriptorPool();
+    void createBuffers();
+    void createDescriptorSet();
+
+    void createPipeline();
+    void createCommandPool();
+    void createCommandBuffer();
+    void recordCommandBuffer();
 };
 
 // public functions
