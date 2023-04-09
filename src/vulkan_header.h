@@ -188,7 +188,7 @@ void VKC::createLogicalDevice() {
 
     VkPhysicalDeviceFeatures deviceFeatures{};
 
-    VkDeviceCreateInfo deviceCI;
+    VkDeviceCreateInfo deviceCI{};
     deviceCI.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     deviceCI.queueCreateInfoCount = 1;
     deviceCI.pQueueCreateInfos = &queueCI;
@@ -216,7 +216,7 @@ void VKC::createDescriptorSetLayout() {
   layoutBindings[1].pImmutableSamplers = nullptr;
   layoutBindings[1].stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
   
-  VkDescriptorSetLayoutCreateInfo layoutCI;
+  VkDescriptorSetLayoutCreateInfo layoutCI{};
   layoutCI.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
   layoutCI.bindingCount = layoutBindings.size();
   layoutCI.pBindings = layoutBindings.data();
@@ -294,7 +294,7 @@ void VKC::createPipeline() {
   auto shaderCode = vkc::readFile("shaders/comp.spv");
   VkShaderModule shaderModule = vkc::createShaderModule(device, shaderCode);
   
-  VkPipelineShaderStageCreateInfo shaderStageCI;
+  VkPipelineShaderStageCreateInfo shaderStageCI{};
   shaderStageCI.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
   shaderStageCI.stage = VK_SHADER_STAGE_COMPUTE_BIT;
   shaderStageCI.module = shaderModule;
