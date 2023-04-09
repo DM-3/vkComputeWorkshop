@@ -67,7 +67,7 @@ namespace vkc {
   
   // function
   VkShaderModule createShaderModule(VkDevice device, const std::vector<char>& code) {
-    VkShaderModuleCreateInfo moduleCI;
+    VkShaderModuleCreateInfo moduleCI{};
     moduleCI.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     moduleCI.codeSize = code.size();
     moduleCI.pCode = reinterpret_cast<const uint32_t*>(code.data());
